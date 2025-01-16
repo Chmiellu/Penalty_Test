@@ -15,14 +15,11 @@ output_image_num = 0
 
 for image in image_names:
     print(image)
-    # first, read the image
+
     img = cv2.imread(os.path.join(input_path,image), cv2.IMREAD_COLOR)
 
-    #crop
     crop = img[y_min:y_max, x_min:x_max]
 
-    #outImage = Image.fromarray(crop)
-    #outImage.save(os.path.join(output_path, str(output_image_num))+".jpg")
     cv2.imwrite(os.path.join(output_path, str(output_image_num))+".jpg", crop)
     output_image_num += 1
 

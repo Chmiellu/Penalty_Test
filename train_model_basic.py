@@ -40,18 +40,18 @@ with open(MODEL_SUMMARY_FILE, "w", encoding="utf-8") as fh:
 
 # data augmentation
 training_data_generator = ImageDataGenerator(
-    rescale=1/255,
+    rescale=1/128,
     shear_range=0.1,
     zoom_range=0.1,
     rotation_range=5,
     horizontal_flip=False)
 
 validation_data_generator = ImageDataGenerator(
-    rescale=1/255
+    rescale=1/128
 )
 
 test_data_generator = ImageDataGenerator(
-    rescale=1/255
+    rescale=1/128
 )
 
 # load data using flow (stream of data)
