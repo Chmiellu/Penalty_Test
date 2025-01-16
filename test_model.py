@@ -8,7 +8,9 @@ from sklearn.metrics import classification_report
 
 # Ścieżki do modelu i danych testowych
 model_dir = 'model'
-model_name = 'modelchmiel.h5'
+#model_name = 'modelBASIC.h5'
+#model_name = 'modelMIDDLE.h5'
+model_name = 'modelPRO.h5'
 image_path = 'data/test'
 
 # Załaduj model
@@ -93,6 +95,6 @@ for class_name, class_acc in class_accuracies.items():
 
 # Wyświetl i zapisz wynik
 cv2.imshow("Results", grid_image)
-cv2.imwrite("test_results_with_class_accuracy.png", grid_image)
+cv2.imwrite("test_results_with_class_accuracy_PRO.png", grid_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

@@ -19,7 +19,7 @@ MODEL_SUMMARY_FILE = "model_summary_pro.txt"
 # hyperparameters
 IMAGE_WIDTH, IMAGE_HEIGHT = 128, 128
 RGB = 3
-EPOCHS = 20
+EPOCHS = 25
 BATCH_SIZE = 4
 
 # create CNN model
@@ -29,16 +29,8 @@ model.add(Conv2D(64, (3, 3), padding='same', input_shape=(IMAGE_WIDTH, IMAGE_HEI
 model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='tanh'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='tanh'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten())
@@ -105,7 +97,7 @@ if(TRAIN):
         callbacks=[CSVLogger('log.csv', append=False, separator=",")]
     )
 
-    model.save('modelchmiel.h5')
+    model.save('modelPRO.h5')
 
     # Plot Accuracy
     plt.figure(figsize=(10, 6))

@@ -1,11 +1,11 @@
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
-from keras.optimizers import Adam, RMSprop
-from keras.preprocessing.image import ImageDataGenerator
+from keras.layers import Dense, Flatten
+from keras.optimizers import RMSprop
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import CSVLogger
+import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+import matplotlib.ticker as ticker
 
 # TRAIN? 1, TEST? 0
 TRAIN = 1
@@ -13,47 +13,29 @@ TRAIN = 1
 training_data_dir = "data/training"
 validation_data_dir = "data/validation"
 test_data_dir = "data/test"
-MODEL_SUMMARY_FILE = "model_summary.txt"
+MODEL_SUMMARY_FILE = "model_summary_basic.txt"
 
 # hyperparameters
 IMAGE_WIDTH, IMAGE_HEIGHT = 128, 128
 RGB = 3
-GRAY = 1
-EPOCHS = 20
+EPOCHS = 10
 BATCH_SIZE = 4
 
-# create CNN model
+# create BASIC model
 model = Sequential()
 
-model.add(Conv2D(32,(3,3), padding='same', input_shape=(IMAGE_WIDTH, IMAGE_HEIGHT, RGB), activation='relu'))
-model.add(Conv2D(32,(3,3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
+# Input layer + one hidden layer
+model.add(Flatten(input_shape=(IMAGE_WIDTH, IMAGE_HEIGHT, RGB)))
+model.add(Dense(64, activation='sigmoid'))
 
-model.add(Conv2D(64,(3,3), padding='same', activation='relu'))
-model.add(Conv2D(64,(3,3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
+# Output layer
+model.add(Dense(3, activation='sigmoid'))
 
-model.add(Conv2D(128,(3,3), padding='same', activation='relu'))
-model.add(Conv2D(128,(3,3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
+model.compile(loss='categorical_crossentropy', optimizer=RMSprop(learning_rate=0.0005), metrics=['accuracy'])
 
-model.add(Conv2D(256,(3,3), padding='same', activation='relu'))
-model.add(Conv2D(256,(3,3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
-
-model.add(Flatten())
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.5))
-
-model.add(Dense(3))
-model.add(Activation('softmax'))
-
-model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001), metrics=['accuracy'])
 model.summary()
 
-with open(MODEL_SUMMARY_FILE,"w") as fh:
+with open(MODEL_SUMMARY_FILE, "w", encoding="utf-8") as fh:
     model.summary(print_fn=lambda line: fh.write(line + "\n"))
 
 # data augmentation
@@ -65,7 +47,7 @@ training_data_generator = ImageDataGenerator(
     horizontal_flip=False)
 
 validation_data_generator = ImageDataGenerator(
-    rescale=1/225
+    rescale=1/255
 )
 
 test_data_generator = ImageDataGenerator(
@@ -94,13 +76,40 @@ test_generator = test_data_generator.flow_from_directory(
 
 # training
 if(TRAIN):
-    model.fit_generator(
+    history = model.fit(
         training_generator,
-        steps_per_epoch = len(training_generator.filenames) // BATCH_SIZE,
+        steps_per_epoch=len(training_generator.filenames) // BATCH_SIZE,
         epochs=EPOCHS,
         validation_data=validation_generator,
         validation_steps=len(validation_generator.filenames) // BATCH_SIZE,
         verbose=1,
-        callbacks=[CSVLogger('log.csv', append=False, separator=",")])
+        callbacks=[CSVLogger('log.csv', append=False, separator=",")]
+    )
 
-    model.save('model.h5')
+    model.save('modelBASIC.h5')
+
+    # Plot Accuracy
+    plt.figure(figsize=(10, 6))
+    plt.plot(history.history['accuracy'], label='Training Accuracy', color='blue', linestyle='--')
+    plt.plot(history.history['val_accuracy'], label='Validation Accuracy', color='green')
+    plt.title('Model Accuracy per Epoch')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.grid(True)
+    plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(2))  # Epochs go every 2
+    plt.savefig('accuracy_plot_BASIC.png')  # Save the accuracy plot
+    plt.close()
+
+    # Plot Loss
+    plt.figure(figsize=(10, 6))
+    plt.plot(history.history['loss'], label='Training Loss', color='blue', linestyle='--')
+    plt.plot(history.history['val_loss'], label='Validation Loss', color='green')
+    plt.title('Model Loss per Epoch')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True)
+    plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(2))  # Epochs go every 2
+    plt.savefig('loss_plot_BASIC.png')  # Save the loss plot
+    plt.close()
